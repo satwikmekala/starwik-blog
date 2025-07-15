@@ -1,0 +1,186 @@
+/* Google Fonts loaded in HTML: Space Grotesk (headings), Inter (body) */
+
+:root {
+  --bg-main: #0a1026;
+  --star-color: #fff;
+  --accent-yellow: #ffe066;
+  --accent-teal: #4fd1c5;
+  --accent-purple: #a18fff;
+  --card-bg: rgba(20, 24, 48, 0.95);
+  --card-glow: 0 0 24px 4px var(--accent-purple);
+  --text-main: #f5f6fa;
+  --text-dim: #b3b8c5;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-family: 'Inter', Arial, sans-serif;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Remove old .starfield and related keyframes */
+.starfield, .starfield::before, .starfield::after {
+  display: none !important;
+}
+
+/* Parallax starfield styles */
+.starfield-parallax {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--bg-main);
+}
+.star-layer {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+.star {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+  box-shadow: 0 0 2px 0 #fff8, 0 0 6px 0 #fff2;
+}
+
+.site-header {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 2.5rem 1rem 1.5rem 1rem;
+}
+.logo {
+  width: 190px;
+  height: auto;
+  display: block;
+  margin: 0 auto 0.5rem auto;
+  border-radius: 18px;
+  background: transparent;
+}
+.site-title {
+  display: none;
+}
+.tagline {
+  font-size: 1.1rem;
+  color: var(--text-dim);
+  font-weight: 400;
+  margin: 0 auto 0.5rem auto;
+  max-width: 420px;
+}
+
+.blog-main {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.blog-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3.5rem 3rem;
+  justify-content: center;
+  margin: 3.5rem 0 4rem 0;
+  width: 100%;
+  max-width: 1100px;
+}
+
+.blog-card {
+  background: var(--card-bg);
+  border-radius: 2rem;
+  box-shadow: 0 0 0 0 var(--accent-teal), var(--card-glow);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  min-width: 260px;
+  max-width: 320px;
+  flex: 1 1 260px;
+  transition: transform 0.25s cubic-bezier(.4,2,.6,1), box-shadow 0.25s;
+  position: relative;
+  overflow: hidden;
+  border: 1.5px solid var(--accent-teal);
+  margin-bottom: 0.5rem;
+}
+.blog-card:hover {
+  transform: scale(1.045) translateY(-6px);
+  box-shadow: 0 0 24px 6px var(--accent-teal), 0 0 32px 8px var(--accent-purple);
+  border-color: var(--accent-yellow);
+}
+.blog-card h2 {
+  font-family: 'Space Grotesk', 'Inter', Arial, sans-serif;
+  font-size: 1.3rem;
+  color: var(--accent-yellow);
+  margin: 0 0 0.5rem 0;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-shadow: 0 0 4px var(--accent-yellow), 0 0 1px #fff;
+}
+.blog-card p {
+  color: var(--text-main);
+  font-size: 1rem;
+  margin: 0 0 1.2rem 0;
+  font-weight: 400;
+}
+.read-more {
+  color: var(--accent-teal);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: color 0.2s;
+  letter-spacing: 0.01em;
+}
+.read-more:hover {
+  color: var(--accent-yellow);
+  text-shadow: 0 0 6px var(--accent-yellow);
+}
+
+.site-footer {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  padding: 2rem 1rem 1.5rem 1rem;
+  margin-top: 2rem;
+  letter-spacing: 0.01em;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+  .blog-cards {
+    gap: 1.2rem;
+  }
+  .blog-card {
+    min-width: 220px;
+    max-width: 98vw;
+    padding: 1.3rem 1rem 1rem 1rem;
+  }
+}
+@media (max-width: 600px) {
+  .site-header {
+    padding: 1.2rem 0.5rem 1rem 0.5rem;
+  }
+  .site-title {
+    font-size: 1.6rem;
+  }
+  .blog-cards {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  .blog-card {
+    min-width: 0;
+    max-width: 98vw;
+    padding: 1rem 0.7rem 0.7rem 0.7rem;
+  }
+} 
