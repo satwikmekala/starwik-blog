@@ -63,6 +63,58 @@ function setupParallaxStarfield() {
       layer.style.transform = `translate(${x * 120 * speed}px, ${y * 120 * speed}px)`;
     });
   });
+
+  // Subtle twinkle effect: randomly apply to a small subset of stars
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!prefersReducedMotion) {
+    const allStars = Array.from(container.querySelectorAll('.star'));
+    const maxConcurrentRatio = 0.08; // 8% of stars at most
+    const maxConcurrent = Math.max(1, Math.floor(allStars.length * maxConcurrentRatio));
+    const activeTwinkles = new Set();
+
+    function scheduleTwinkleOnStar(star) {
+      if (activeTwinkles.has(star)) return;
+
+      // Random chance each scheduling tick
+      const chance = 0.08; // 8% chance to twinkle this star on tick
+      if (Math.random() > chance) return;
+
+      if (activeTwinkles.size >= maxConcurrent) return;
+
+      activeTwinkles.add(star);
+
+      // Random duration and brightness level
+      const duration = (1.2 + Math.random() * 1.3).toFixed(2) + 's'; // 1.2s - 2.5s
+      const brightness = Math.random() < 0.75 ? 1.4 : 1.8; // mostly subtle, occasional stronger
+      star.style.setProperty('--twinkle-duration', duration);
+      star.style.setProperty('--twinkle-brightness', String(brightness));
+
+      // Trigger animation via class
+      star.classList.add('twinkle');
+
+      const handleEnd = () => {
+        star.classList.remove('twinkle');
+        star.removeEventListener('animationend', handleEnd);
+        activeTwinkles.delete(star);
+      };
+      star.addEventListener('animationend', handleEnd, { once: true });
+    }
+
+    // Spread checks over time to avoid bursts; lightweight loop
+    const tickIntervalMs = 500;
+    const twinkleTimer = setInterval(() => {
+      if (document.hidden) return; // pause when tab hidden
+      // Pick a few random stars to attempt twinkle
+      const attempts = Math.min(6, allStars.length);
+      for (let i = 0; i < attempts; i++) {
+        const idx = Math.floor(Math.random() * allStars.length);
+        scheduleTwinkleOnStar(allStars[idx]);
+      }
+    }, tickIntervalMs);
+
+    // Clean up on page hide/unload
+    window.addEventListener('beforeunload', () => clearInterval(twinkleTimer));
+  }
 }
 
 document.addEventListener('DOMContentLoaded', setupParallaxStarfield); 

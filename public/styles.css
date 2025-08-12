@@ -53,6 +53,21 @@ html, body {
   box-shadow: 0 0 2px 0 #fff8, 0 0 6px 0 #fff2;
 }
 
+/* Subtle star twinkle animation */
+@keyframes twinkle {
+  0%, 100% { opacity: 1; filter: brightness(1); }
+  50% { opacity: 0.85; filter: brightness(var(--twinkle-brightness, 1.5)); }
+}
+
+.star.twinkle {
+  animation: twinkle var(--twinkle-duration, 1.8s) ease-in-out both;
+  will-change: opacity, filter;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star.twinkle { animation: none !important; }
+}
+
 .site-header {
   position: relative;
   z-index: 1;
@@ -67,6 +82,41 @@ html, body {
   border-radius: 18px;
   background: transparent;
 }
+
+/* Subtle grow + glow for Starwik logo */
+.logo-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  outline: none;
+}
+
+.logo-img {
+  display: block;
+  transform-origin: center;
+  transition: transform 200ms ease;
+  will-change: transform;
+}
+
+.logo-link:hover .logo-img,
+.logo-link:focus-visible .logo-img {
+  transform: scale(1.03);
+}
+
+/* (Glow removed) */
+
+.logo-link:active .logo-img { transform: scale(0.99); }
+
+.logo-link:focus-visible {
+  outline: 2px solid rgba(123,215,255,0.55);
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) { .logo-img, .logo-wrap::after { transition: none; } }
+
+/* Remove halo; keep wrapper only for structure */
+.logo-wrap { position: relative; display: inline-grid; place-items: center; }
 .site-title {
   display: none;
 }
