@@ -1,8 +1,8 @@
 // Parallax Starfield by mouse movement
 const STAR_LAYERS = [
-  { count: 100, size: 1, speed: 0.03, color: '#fff' },
-  { count: 60, size: 2, speed: 0.06, color: '#ffe066' },
-  { count: 30, size: 3, speed: 0.09, color: '#4fd1c5' }
+  { count: 220, size: 1, speed: 0.03, color: '#fff' },
+  { count: 140, size: 2, speed: 0.06, color: '#ffe066' },
+  { count: 80, size: 3, speed: 0.09, color: '#4fd1c5' }
 ];
 
 function createStars(count, size, color) {
@@ -68,7 +68,7 @@ function setupParallaxStarfield() {
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!prefersReducedMotion) {
     const allStars = Array.from(container.querySelectorAll('.star'));
-    const maxConcurrentRatio = 0.08; // 8% of stars at most
+    const maxConcurrentRatio = 0.22; // up to 22% of stars can twinkle concurrently
     const maxConcurrent = Math.max(1, Math.floor(allStars.length * maxConcurrentRatio));
     const activeTwinkles = new Set();
 
@@ -76,7 +76,7 @@ function setupParallaxStarfield() {
       if (activeTwinkles.has(star)) return;
 
       // Random chance each scheduling tick
-      const chance = 0.08; // 8% chance to twinkle this star on tick
+      const chance = 0.28; // 28% chance to twinkle this star on tick
       if (Math.random() > chance) return;
 
       if (activeTwinkles.size >= maxConcurrent) return;
@@ -84,8 +84,8 @@ function setupParallaxStarfield() {
       activeTwinkles.add(star);
 
       // Random duration and brightness level
-      const duration = (1.2 + Math.random() * 1.3).toFixed(2) + 's'; // 1.2s - 2.5s
-      const brightness = Math.random() < 0.75 ? 1.4 : 1.8; // mostly subtle, occasional stronger
+      const duration = (0.8 + Math.random() * 1.4).toFixed(2) + 's'; // 0.8s - 2.2s
+      const brightness = Math.random() < 0.7 ? 1.9 : 2.5; // more punchy, occasional stronger
       star.style.setProperty('--twinkle-duration', duration);
       star.style.setProperty('--twinkle-brightness', String(brightness));
 
@@ -101,11 +101,11 @@ function setupParallaxStarfield() {
     }
 
     // Spread checks over time to avoid bursts; lightweight loop
-    const tickIntervalMs = 500;
+    const tickIntervalMs = 320;
     const twinkleTimer = setInterval(() => {
       if (document.hidden) return; // pause when tab hidden
-      // Pick a few random stars to attempt twinkle
-      const attempts = Math.min(6, allStars.length);
+      // Pick a subset of stars to attempt twinkle
+      const attempts = Math.min(Math.ceil(allStars.length * 0.08), 60);
       for (let i = 0; i < attempts; i++) {
         const idx = Math.floor(Math.random() * allStars.length);
         scheduleTwinkleOnStar(allStars[idx]);
