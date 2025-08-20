@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">Blog Post - Starwik</title>
+  <!-- Google Fonts: Space Grotesk for headings, Inter for body -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/blog-post.css">
+</head>
+<body>
+  <div id="galaxy-bg" class="galaxy-bg" aria-hidden="true"></div>
+  <script type="module" src="/galaxy.js"></script>
+  <script type="module" src="/scrambled-text.js"></script>
+  <script src="/script.js"></script>
+  
+  <!-- Navigation Header -->
+  <header class="blog-post-header">
+    <nav class="blog-nav">
+      <a href="/" class="back-link">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back to Home
+      </a>
+      <div class="logo-small">
+        <img src="/svg/starwik-logo.png" alt="Starwik" />
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="blog-post-main">
+    <article class="blog-post-container">
+      <!-- Post Header -->
+      <header class="post-header">
+        <h1 id="post-title" class="post-title">The Self-Image Shift</h1>
+        <p id="post-subtitle" class="post-subtitle">How changing the way I see myself changed everything else, too.</p>
+        <div class="post-meta">
+          <time id="post-date" class="post-date">April 4, 2023</time>
+          <span class="post-reading-time">5 min read</span>
+        </div>
+      </header>
+
+      <!-- Post Content -->
+      <div class="post-content">
+        <div class="post-intro">
+          <p>In the quiet moments between stars, my self-perception underwent a profound transformation.</p>
+        </div>
+
+        <div id="post-body" class="post-body">
+          <p>Lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
+
+          <h2>The Moment of Realization</h2>
+          <p>It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages.</p>
+
+          <blockquote>
+            <p>"The most profound transformations happen not in the grand gestures, but in the quiet moments when we choose to see ourselves differently."</p>
+          </blockquote>
+
+          <p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.</p>
+
+          <h3>Understanding the Process</h3>
+          <p>Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature.</p>
+
+          <ul>
+            <li>Recognizing patterns in self-doubt</li>
+            <li>Challenging limiting beliefs</li>
+            <li>Embracing growth mindset</li>
+            <li>Practicing self-compassion</li>
+          </ul>
+
+          <p>The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form.</p>
+
+          <h2>Moving Forward</h2>
+          <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.</p>
+
+          <p>If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary.</p>
+        </div>
+      </div>
+
+      <!-- Post Footer -->
+      <footer class="post-footer">
+        <div class="post-tags" id="post-tags">
+          <!-- Tags will be loaded dynamically -->
+        </div>
+        <div class="post-navigation">
+          <a href="/" class="nav-button">← More Posts</a>
+        </div>
+      </footer>
+    </article>
+  </main>
+
+  <script>
+    // Dynamic content loading from database
+    document.addEventListener('DOMContentLoaded', () => {
+      // Extract slug from URL path (/blog/slug-name)
+      const pathParts = window.location.pathname.split('/');
+      const slug = pathParts[pathParts.length - 1];
+      
+      if (slug) {
+        loadBlogPost(slug);
+      } else {
+        showNotFound();
+      }
+    });
+
+    async function loadBlogPost(slug) {
+      try {
+        const response = await fetch(`/api/blog/${slug}`);
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            showNotFound();
+          } else {
+            showError();
+          }
+          return;
+        }
+        
+        const post = await response.json();
+        
+        // Update page title and meta
+        document.getElementById('page-title').textContent = `${post.title} - Starwik`;
+        document.getElementById('post-title').textContent = post.title;
+        document.getElementById('post-subtitle').textContent = post.subtitle || '';
+        document.getElementById('post-date').textContent = new Date(post.created_at).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        document.querySelector('.post-reading-time').textContent = `${post.reading_time} min read`;
+        
+        // Load the content
+        const contentContainer = document.querySelector('.post-content');
+        if (contentContainer && post.content) {
+          contentContainer.innerHTML = post.content;
+        }
+        
+        // Load and display tags
+        loadPostTags(post.tags);
+        
+      } catch (error) {
+        console.error('Error loading post:', error);
+        showError();
+      }
+    }
+    
+    function loadPostTags(tagsData) {
+      const tagsContainer = document.getElementById('post-tags');
+      
+      // Clear existing content
+      tagsContainer.innerHTML = '';
+      
+      try {
+        // Parse tags from JSON string
+        const tags = tagsData ? JSON.parse(tagsData) : [];
+        
+        // Only show tags if there are any
+        if (tags && tags.length > 0) {
+          tags.forEach(tag => {
+            const tagElement = document.createElement('span');
+            tagElement.className = 'tag';
+            tagElement.textContent = tag;
+            tagsContainer.appendChild(tagElement);
+          });
+        }
+        // If no tags, leave the container empty
+        
+      } catch (error) {
+        console.error('Error parsing tags:', error);
+        // If there's an error parsing tags, leave container empty
+      }
+    }
+    
+    function showNotFound() {
+      document.getElementById('page-title').textContent = 'Post Not Found - Starwik';
+      document.getElementById('post-title').textContent = 'Post Not Found';
+      document.getElementById('post-subtitle').textContent = 'The post you\'re looking for doesn\'t exist.';
+      document.getElementById('post-date').textContent = '';
+      document.querySelector('.post-reading-time').textContent = '';
+      document.querySelector('.post-content').innerHTML = `
+        <div class="post-body">
+          <p>Sorry, the blog post you're looking for couldn't be found.</p>
+          <p><a href="/" style="color: var(--accent-teal); text-decoration: none;">← Return to home</a> to see all available posts.</p>
+        </div>
+      `;
+    }
+    
+    function showError() {
+      document.getElementById('page-title').textContent = 'Error - Starwik';
+      document.getElementById('post-title').textContent = 'Something went wrong';
+      document.getElementById('post-subtitle').textContent = 'We encountered an error loading this post.';
+      document.getElementById('post-date').textContent = '';
+      document.querySelector('.post-reading-time').textContent = '';
+      document.querySelector('.post-content').innerHTML = `
+        <div class="post-body">
+          <p>We're sorry, but there was an error loading this post. Please try again later.</p>
+          <p><a href="/" style="color: var(--accent-teal); text-decoration: none;">← Return to home</a></p>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

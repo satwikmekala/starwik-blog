@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Starwik Blog - Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin-styles.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="/svg/starwik-logo.png" alt="Starwik" />
+        <span>Admin</span>
+      </div>
+      <nav class="nav">
+        <button class="nav-btn active" data-section="posts">📝 Posts</button>
+        <button class="nav-btn" data-section="editor">✍️ Write</button>
+        <button class="nav-btn" data-section="images">🖼️ Images</button>
+        <a href="/" class="nav-btn" target="_blank">🌐 View Site</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Posts List -->
+      <section id="posts-section" class="section active">
+        <div class="section-header">
+          <h1>Your Posts</h1>
+          <button class="btn-primary" onclick="showEditor()">New Post</button>
+        </div>
+        <div class="posts-list" id="posts-list">
+          <!-- Posts loaded here -->
+        </div>
+      </section>
+
+      <!-- Post Editor -->
+      <section id="editor-section" class="section">
+        <div class="editor-header">
+          <div class="editor-actions">
+            <button class="btn-secondary" onclick="showPosts()">← Back</button>
+            <button class="btn-draft" onclick="savePost('draft')">Save Draft</button>
+            <button class="btn-primary" onclick="savePost('published')">Publish</button>
+          </div>
+        </div>
+        
+        <!-- Live Editor - Mimics actual blog post layout -->
+        <div class="live-editor-container">
+          <input type="hidden" id="post-id" />
+          
+          <!-- Floating Toolbar -->
+          <div class="floating-toolbar" id="floating-toolbar">
+            <button type="button" class="tool-btn" onclick="formatText('bold')" title="Bold (Ctrl+B)">
+              <strong>B</strong>
+            </button>
+            <button type="button" class="tool-btn" onclick="formatText('italic')" title="Italic (Ctrl+I)">
+              <em>I</em>
+            </button>
+            <button type="button" class="tool-btn" onclick="insertHeading()" title="Heading">H2</button>
+            <button type="button" class="tool-btn" onclick="insertSubHeading()" title="Sub Heading">H3</button>
+            <button type="button" class="tool-btn" onclick="insertQuote()" title="Quote">❝</button>
+            <button type="button" class="tool-btn" onclick="toggleCodeBlock()" title="Code Block">{}</button>
+            <button type="button" class="tool-btn" onclick="insertList()" title="List">•</button>
+            <label class="tool-btn" for="image-insert" title="Insert Image">🖼️
+              <input type="file" id="image-insert" accept="image/*" style="display: none;" onchange="insertImage(this)" />
+            </label>
+          </div>
+          
+          <!-- Blog Post Container - Exact replica of front-end -->
+          <article class="live-blog-post">
+            <!-- Post Header -->
+            <header class="live-post-header">
+              <h1 id="live-post-title" contenteditable="true" class="live-title" placeholder="Your post title...">Your post title...</h1>
+              <p id="live-post-subtitle" contenteditable="true" class="live-subtitle" placeholder="Subtitle (optional)...">Subtitle (optional)...</p>
+              <div class="live-post-meta">
+                <time class="live-post-date">Today</time>
+                <span class="live-reading-time">5 min read</span>
+              </div>
+            </header>
+
+            <!-- Post Content -->
+            <div class="live-post-content">
+              <div id="live-content-editor" contenteditable="true" class="live-content" placeholder="Start writing your post...">
+                <p>Start writing your post...</p>
+              </div>
+            </div>
+
+            <!-- Tags Editor -->
+            <div class="live-tags-section">
+              <h4>Tags</h4>
+              <div class="tags-editor">
+                <div class="tags-container" id="tags-container">
+                  <!-- Tags will appear here -->
+                </div>
+                <input type="text" id="tag-input" placeholder="Add a tag..." class="tag-input" />
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Images Gallery -->
+      <section id="images-section" class="section">
+        <div class="section-header">
+          <h1>Image Gallery</h1>
+          <label class="btn-primary" for="bulk-upload">
+            Upload Images
+            <input type="file" id="bulk-upload" accept="image/*" multiple style="display: none;" onchange="uploadImages(this)" />
+          </label>
+        </div>
+        <div class="images-grid" id="images-grid">
+          <!-- Images loaded here -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="spinner" id="spinner">
+    <div class="spinner-ring"></div>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Image Editor Modal -->
+  <div class="modal-overlay" id="image-editor-modal">
+    <div class="modal-content image-editor-content">
+      <div class="modal-header">
+        <h3>Edit Image</h3>
+        <button class="modal-close" onclick="closeImageEditor()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="image-editor-container">
+          <div class="editor-canvas-container">
+            <img id="editor-image" src="" alt="Image to edit" />
+          </div>
+          <div class="editor-controls">
+            <div class="control-group">
+              <label>Crop Aspect Ratio:</label>
+              <select id="aspect-ratio-select">
+                <option value="free">Free</option>
+                <option value="1">Square (1:1)</option>
+                <option value="1.777">Widescreen (16:9)</option>
+                <option value="1.333">Standard (4:3)</option>
+                <option value="0.75">Portrait (3:4)</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label>Resize Width:</label>
+              <input type="number" id="resize-width" placeholder="Auto" min="50" max="2000" />
+              <span>px</span>
+            </div>
+            <div class="control-group">
+              <label>Resize Height:</label>
+              <input type="number" id="resize-height" placeholder="Auto" min="50" max="2000" />
+              <span>px</span>
+            </div>
+            <div class="control-group">
+              <label>
+                <input type="checkbox" id="maintain-aspect" checked />
+                Maintain aspect ratio
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeImageEditor()">Cancel</button>
+        <button class="btn-primary" onclick="applyImageEdits()">Apply & Insert</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include Cropper.js from CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+  <script src="/admin-script.js"></script>
+</body>
+</html>
